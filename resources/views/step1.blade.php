@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Step 1 - Jenis Kunjungan</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
        /* --- BASE LAYOUT --- */
 body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background-color: #f7f7f7; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-.mobile-container { width: 100%; max-width: 400px; min-height: 100vh; background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding-bottom: 80px; position: relative; }
-.content { padding: 20px; }
+.mobile-container { width: 100%; max-width: 420px; min-height: 100vh; background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; position: relative; }
+.content { padding: 0; }
 
 /* --- STEPPER --- */
 .stepper-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 12px 8px; background: #fff; margin-bottom: 25px; }
@@ -73,7 +75,7 @@ body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background-col
 .card.selected { border: 2px solid #E05297; background: #fff9fc; }
 
 /* --- FOOTER & BUTTON --- */
-.footer-action { position: fixed; bottom: 0; max-width: 400px; width: 100%; padding: 15px 20px; background: white; box-sizing: border-box; display: flex; justify-content: flex-end; border-top: 1px solid #eee; z-index: 10; }
+.footer-action { position: fixed; bottom: 0; max-width: 420px; width: 100%; padding: 15px 20px; background: white; box-sizing: border-box; display: flex; justify-content: flex-end; border-top: 1px solid #eee; z-index: 10; left: 50%; transform: translateX(-50%); }
 .btn-lanjut { background: linear-gradient(to right, #6A8BB0, #E05297); color: white; padding: 12px 35px; border-radius: 12px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(224, 82, 151, 0.2); }
 .btn-lanjut:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
     </style>

@@ -54,9 +54,10 @@
         }
 
         .logo-img {
-            width: 150px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             margin: 0 auto;
         }
@@ -414,7 +415,7 @@
             }
 
             .logo-img {
-                width: 130px;
+                width: 150px;
             }
         }
 
@@ -496,7 +497,7 @@
             }
 
             .logo-img {
-                width: 110px;
+                width: 140px;
             }
 
             .system-title {
@@ -661,52 +662,58 @@
             </form>
 
             <div class="cards">
-                @forelse($pengajuan as $item)
-                    <div class="pengajuan-card">
-                        <div class="pengajuan-top">
-                            <div>
-                                <div class="nama">{{ $item['nama'] }}</div>
-                                <div class="instansi">{{ $item['instansi'] }}</div>
-                            </div>
-
-                            <div class="status-badge">{{ $item['status'] }}</div>
+            @forelse($pengajuan as $item)
+                <div class="pengajuan-card">
+                    <div class="pengajuan-top">
+                        <div>
+                            <div class="nama">{{ $item->nama_pengunjung ?? ($item['nama'] ?? '-') }}</div>
+                            <div class="instansi">{{ $item->asal_institusi ?? ($item['instansi'] ?? '-') }}</div>
                         </div>
 
-                        <div class="info-list">
-                            <div class="info-item">
-                                <div class="icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <circle cx="12" cy="12" r="10" stroke="#222" stroke-width="2"/>
-                                        <path d="M12 7V12L15 15" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <span>{{ $item['tanggal'] }}</span>
-                            </div>
+                        <div class="status-badge">{{ $item->status ?? ($item['status'] ?? '-') }}</div>
+                    </div>
 
-                            <div class="info-item">
-                                <div class="icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <path d="M9 4H15" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
-                                        <rect x="6" y="3" width="12" height="18" rx="2" stroke="#222" stroke-width="1.8"/>
-                                        <path d="M9 8H15" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
-                                        <path d="M9 12H13" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
-                                        <path d="M18 9L21 12L18 15" stroke="#222" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <span>{{ $item['keperluan'] }}</span>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="#222" stroke-width="2"/>
+                                    <path d="M12 7V12L15 15" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </div>
+                            <span>
+                                {{
+                                    isset($item->tanggal_kunjungan)
+                                        ? optional($item->tanggal_kunjungan)->translatedFormat('d F Y')
+                                        : ($item['tanggal'] ?? '-')
+                                }}
+                            </span>
                         </div>
 
-                        <a href="{{ route('admin.pengajuan.detail', $item['id']) }}" class="detail-btn">
-                            Lihat Detail dan Verifikasi
-                        </a>
+                        <div class="info-item">
+                            <div class="icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M9 4H15" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
+                                    <rect x="6" y="3" width="12" height="18" rx="2" stroke="#222" stroke-width="1.8"/>
+                                    <path d="M9 8H15" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
+                                    <path d="M9 12H13" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>
+                                    <path d="M18 9L21 12L18 15" stroke="#222" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <span>{{ $item->tujuan_kunjungan ?? ($item['keperluan'] ?? '-') }}</span>
+                        </div>
                     </div>
-                @empty
-                    <div class="empty-state">
-                        Data pengajuan tidak ditemukan.
-                    </div>
-                @endforelse
-            </div>
+
+                    <a href="{{ route('admin.pengajuan.detail', $item->id ?? $item['id']) }}" class="detail-btn">
+                        Lihat Detail dan Verifikasi
+                    </a>
+                </div>
+            @empty
+                <div class="empty-state">
+                    Data pengajuan tidak ditemukan.
+                </div>
+            @endforelse
+        </div>
         </main>
     </div>
 

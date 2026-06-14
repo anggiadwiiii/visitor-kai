@@ -53,9 +53,10 @@
         }
 
         .logo-img {
-            width: 150px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             margin: 0 auto;
         }
@@ -778,6 +779,24 @@
             </div>
         </div>
 
+        @if(session('success'))
+            <div style="margin-bottom:12px; padding:12px 14px; border-radius:8px; background:#dcfce7; color:#166534; font-size:14px; border:1px solid #bbf7d0;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div style="margin-bottom:12px; padding:12px 14px; border-radius:8px; background:#fee2e2; color:#991b1b; font-size:14px; border:1px solid #fecaca;">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div style="margin-bottom:12px; padding:12px 14px; border-radius:8px; background:#fff7ed; color:#9a3412; font-size:14px; border:1px solid #fdba74;">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="label">Total Pengguna</div>
@@ -876,53 +895,54 @@
     <div class="modal-content">
         <div class="modal-title">Tambah Pengguna</div>
 
-        <form>
+        <form method="POST" action="{{ route('admin.users.store') }}">
+            @csrf
             <div class="form-grid">
                 <div class="form-group">
                     <label>Nama Lengkap</label>
-                    <input type="text" class="form-control" placeholder="Masukkan nama lengkap">
+                    <input type="text" name="nama" class="form-control" placeholder="Masukkan nama lengkap">
                 </div>
 
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" class="form-control" placeholder="Masukkan username">
+                    <input type="text" name="username" class="form-control" placeholder="Masukkan username">
                 </div>
 
                 <div class="form-group full-width">
                     <label>Email</label>
-                    <input type="email" class="form-control" placeholder="Masukkan email">
+                    <input type="email" name="email" class="form-control" placeholder="Masukkan email">
                 </div>
 
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" class="form-control" placeholder="Masukkan password">
+                    <input type="password" name="password" class="form-control" placeholder="Masukkan password">
                 </div>
 
                 <div class="form-group">
                     <label>Konfirmasi Password</label>
-                    <input type="password" class="form-control" placeholder="Ulangi password">
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password">
                 </div>
 
                 <div class="form-group">
                     <label>Role</label>
-                    <select class="form-control">
-                        <option>Admin</option>
-                        <option>Petugas</option>
+                    <select name="role" class="form-control">
+                        <option value="Admin">Admin</option>
+                        <option value="Petugas">Petugas</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Status</label>
-                    <select class="form-control">
-                        <option>Aktif</option>
-                        <option>Nonaktif</option>
+                    <select name="status" class="form-control">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
                     </select>
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button type="button" class="btn-modal btn-cancel" onclick="closeModal('addModal')">Batal</button>
-                <button type="button" class="btn-modal btn-save" onclick="closeModal('addModal')">Simpan</button>
+                <button type="submit" class="btn-modal btn-save">Simpan</button>
             </div>
         </form>
     </div>
@@ -933,43 +953,51 @@
     <div class="modal-content">
         <div class="modal-title">Edit Pengguna</div>
 
-        <form>
+        <form method="POST" id="editForm">
+            @csrf
+            @method('PUT')
+
             <div class="form-grid">
                 <div class="form-group">
                     <label>Nama Lengkap</label>
-                    <input type="text" id="editNama" class="form-control">
+                    <input type="text" id="editNama" name="nama" class="form-control">
                 </div>
 
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="editUsername" class="form-control">
+                    <input type="text" id="editUsername" name="username" class="form-control">
                 </div>
 
                 <div class="form-group full-width">
                     <label>Email</label>
-                    <input type="email" id="editEmail" class="form-control">
+                    <input type="email" id="editEmail" name="email" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Password Baru</label>
+                    <input type="password" id="editPassword" name="password" class="form-control" placeholder="Kosongkan jika tidak diubah">
                 </div>
 
                 <div class="form-group">
                     <label>Role</label>
-                    <select id="editRole" class="form-control">
-                        <option>Admin</option>
-                        <option>Petugas</option>
+                    <select id="editRole" name="role" class="form-control">
+                        <option value="Admin">Admin</option>
+                        <option value="Petugas">Petugas</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Status</label>
-                    <select id="editStatus" class="form-control">
-                        <option>Aktif</option>
-                        <option>Nonaktif</option>
+                    <select id="editStatus" name="status" class="form-control">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
                     </select>
                 </div>
             </div>
 
             <div class="modal-actions">
                 <button type="button" class="btn-modal btn-cancel" onclick="closeModal('editModal')">Batal</button>
-                <button type="button" class="btn-modal btn-save" onclick="closeModal('editModal')">Update</button>
+                <button type="submit" class="btn-modal btn-save">Update</button>
             </div>
         </form>
     </div>
@@ -1029,7 +1057,12 @@
 
         <div class="modal-actions">
             <button type="button" class="btn-modal btn-cancel" onclick="closeModal('deleteModal')">Batal</button>
-            <button type="button" class="btn-modal btn-danger" onclick="closeModal('deleteModal')">Hapus</button>
+
+            <form method="POST" id="deleteForm" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-modal btn-danger">Hapus</button>
+            </form>
         </div>
     </div>
 </div>
@@ -1060,26 +1093,39 @@
     }
 
     function showDetail(user) {
-        document.getElementById('detailNama').textContent = user.nama;
-        document.getElementById('detailUsername').textContent = user.username;
-        document.getElementById('detailEmail').textContent = user.email;
-        document.getElementById('detailRole').textContent = user.role;
-        document.getElementById('detailStatus').textContent = user.status;
-        document.getElementById('detailLastLogin').textContent = user.last_login;
+        document.getElementById('detailNama').textContent = user.nama ?? '-';
+        document.getElementById('detailUsername').textContent = user.username ?? '-';
+        document.getElementById('detailEmail').textContent = user.email ?? '-';
+        document.getElementById('detailRole').textContent = user.role ?? '-';
+        document.getElementById('detailStatus').textContent = user.status ?? '-';
+        document.getElementById('detailLastLogin').textContent = user.last_login ?? '-';
         openModal('detailModal');
     }
 
     function editUser(user) {
-        document.getElementById('editNama').value = user.nama;
-        document.getElementById('editUsername').value = user.username;
-        document.getElementById('editEmail').value = user.email;
-        document.getElementById('editRole').value = user.role;
-        document.getElementById('editStatus').value = user.status;
+        document.getElementById('editNama').value = user.nama ?? '';
+        document.getElementById('editUsername').value = user.username ?? '';
+        document.getElementById('editEmail').value = user.email ?? '';
+        document.getElementById('editRole').value = user.role ?? 'Petugas';
+        document.getElementById('editStatus').value = user.status ?? 'Aktif';
+        document.getElementById('editPassword').value = '';
+
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.action = `/admin/kelola-pengguna/${user.id}`;
+        }
+
         openModal('editModal');
     }
 
     function deleteUser(user) {
-        document.getElementById('deleteUserName').textContent = user.nama;
+        document.getElementById('deleteUserName').textContent = user.nama ?? 'ini';
+
+        const deleteForm = document.getElementById('deleteForm');
+        if (deleteForm) {
+            deleteForm.action = `/admin/kelola-pengguna/${user.id}`;
+        }
+
         openModal('deleteModal');
     }
 

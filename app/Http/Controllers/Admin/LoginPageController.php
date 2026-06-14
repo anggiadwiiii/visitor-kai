@@ -15,6 +15,7 @@ class LoginPageController extends Controller
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
+
         return view('admin.login');
     }
 
@@ -28,30 +29,27 @@ class LoginPageController extends Controller
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        // Find user by username
         $user = User::where('username', $request->username)->first();
 
-        // Check if user exists and password matches
         if ($user && Hash::check($request->password, $user->password)) {
-            // Check if user role is Admin or Petugas
-            if ($user->role !== 'Admin' && $user->role !== 'Petugas') {
+            if ($user->role !== 'Admin') {
                 return back()->withErrors([
-                    'login' => 'Anda tidak memiliki akses ke panel admin.',
+                    'login' => 'Hanya pengguna dengan role Admin yang dapat mengakses panel admin ini.',
                 ])->withInput();
             }
 
-            // Check if user status is active
             if ($user->status !== 'Aktif') {
                 return back()->withErrors([
                     'login' => 'Akun Anda telah dinonaktifkan.',
                 ])->withInput();
             }
 
-            // Update last login timestamp
-            $user->update(['last_login' => now()]);
-
-            // Login user
             Auth::login($user);
+            $request->session()->regenerate();
+
+            $user->update([
+                'last_login_at' => now(),
+            ]);
 
             return redirect()->route('admin.dashboard')->with('success', 'Login berhasil.');
         }

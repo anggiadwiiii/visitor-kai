@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin</title>
-
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -87,12 +88,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0 auto;
         }
 
         .logo-img {
-            width: 158px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             filter: drop-shadow(0 10px 22px rgba(90, 55, 255, 0.10));
             transition: transform 0.3s ease;
@@ -635,7 +638,7 @@
             gap: 6px;
         }
 
-        .quick-btn {
+       .quick-btn {
             padding: 8px 8px;
             border: 1.5px solid transparent;
             border-radius: 8px;
@@ -652,6 +655,12 @@
             text-decoration: none;
             font-family: 'Poppins', sans-serif;
             flex-direction: column;
+        }
+        .quick-btn small {
+            font-size: 9px;
+            font-weight: 600;
+            color: #8a8a8a;
+            line-height: 1;
         }
 
         .quick-btn:hover {
@@ -792,7 +801,8 @@
             }
 
             .logo-img {
-                width: 120px;
+                width: 140px;
+                height: auto;
             }
 
             .system-title {
@@ -1102,18 +1112,18 @@
 
                 <div class="top-actions">
                     <div class="mini-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
+                        <!-- <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M8 3L12 7L8 11L4 7L8 3Z"></path>
                             <path d="M16 3L20 7L16 11L12 7L16 3Z" opacity="0.9"></path>
                             <path d="M12 11L16 15L12 19L8 15L12 11Z" opacity="0.75"></path>
-                        </svg>
+                        </svg> -->
                     </div>
                     <div class="mini-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
+                        <!-- <svg viewBox="0 0 24 24" fill="currentColor">
                             <circle cx="6" cy="12" r="1.8"></circle>
                             <circle cx="12" cy="12" r="1.8"></circle>
                             <circle cx="18" cy="12" r="1.8"></circle>
-                        </svg>
+                        </svg> -->
                     </div>
 
                     <div class="profile-menu">
@@ -1174,35 +1184,24 @@
                         Aktivitas Terbaru
                     </div>
                     <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-dot"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Pengajuan Baru Masuk</div>
-                                <div class="activity-time">Baru saja</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-dot"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Pengajuan Disetujui</div>
-                                <div class="activity-time">5 menit lalu</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-dot"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Pengunjung Masuk</div>
-                                <div class="activity-time">15 menit lalu</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-dot"></div>
-                            <div class="activity-content">
-                                <div class="activity-title">Pengajuan Ditinjau</div>
-                                <div class="activity-time">2 jam lalu</div>
-                            </div>
-                        </div>
-                    </div>
+        @forelse($aktivitasTerbaru as $activity)
+            <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ $activity['title'] }}</div>
+                    <div class="activity-time">{{ $activity['time'] }}</div>
+                </div>
+            </div>
+        @empty
+            <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                    <div class="activity-title">Belum ada aktivitas</div>
+                    <div class="activity-time">-</div>
+                </div>
+            </div>
+        @endforelse
+</div>
                 </div>
 
                 <!-- Quick Action -->
@@ -1217,85 +1216,100 @@
                         Quick Action
                     </div>
                     <div class="quick-actions">
-                        <a href="{{ route('admin.pengajuan') }}" class="quick-btn">
+                @foreach($quickActions as $action)
+                    <a href="{{ $action['route'] }}" class="quick-btn">
+                        @if($action['label'] === 'Lihat Pengajuan')
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6 1V11M1 6H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                             </svg>
-                            Lihat Pengajuan
-                        </a>
-                        <a href="{{ route('admin.rekap') }}" class="quick-btn">
+                        @elseif($action['label'] === 'Rekap Data')
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2 10V4M6 10V2M10 10V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                             </svg>
-                            Rekap Data
-                        </a>
-                        <a href="{{ route('admin.users') }}" class="quick-btn">
+                        @elseif($action['label'] === 'Kelola Admin')
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="6" cy="3.5" r="1.5" stroke="currentColor" stroke-width="1"/>
                                 <path d="M2 9.5C2 8.12 3.34 7 5 7H7C8.66 7 10 8.12 10 9.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
                             </svg>
-                            Kelola Admin
-                        </a>
-                        <a href="{{ route('admin.dashboard') }}" class="quick-btn">
+                        @else
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M10.5 5.5H1M6 1V10M1 5.5L1.5 2H10.5L10.5 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Refresh
-                        </a>
-                    </div>
+                        @endif
+
+                        {{ $action['label'] }}
+
+                        @if(!is_null($action['count']))
+                            <small>{{ $action['count'] }}</small>
+                        @endif
+                    </a>
+                @endforeach
+</div>
                 </div>
 
                 <!-- Grafik Kunjungan -->
                 <div class="section-card">
-                    <div class="section-title">
-                        <div class="section-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 11V7M5 11V3M8 11V5M11 11V2" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
-                                <path d="M1.5 12H12.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        Grafik Kunjungan
-                    </div>
-                    <div class="chart-placeholder">
-                        📈 Chart akan ditampilkan di sini
-                    </div>
+    <div class="section-title">
+        <div class="section-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 11V7M5 11V3M8 11V5M11 11V2" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+                <path d="M1.5 12H12.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        Grafik Kunjungan
+    </div>
+
+    <div class="chart-placeholder" style="display:block; padding:12px;">
+        @forelse($chartData as $item)
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <div style="width:40px; font-size:11px;">
+                    {{ $item['label'] }}
                 </div>
+
+                <div style="flex:1; background:#eee; border-radius:999px; height:10px; overflow:hidden;">
+                    <div style="height:10px; width:{{ $item['width'] }}%; background:linear-gradient(90deg,#5338ff,#ff2f8f);"></div>
+                </div>
+
+                <div style="width:24px; font-size:11px; text-align:right;">
+                    {{ $item['total'] }}
+                </div>
+            </div>
+        @empty
+            <div style="text-align:center; font-size:11px; color:#9a9a9a; padding-top:36px;">
+                Belum ada data kunjungan
+            </div>
+        @endforelse
+    </div>
+</div>
 
                 <!-- Insight Singkat -->
                 <div class="section-card">
-                    <div class="section-title">
-                        <div class="section-icon">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="7" cy="7" r="6" stroke="white" stroke-width="1.2"/>
-                                <path d="M7 7V4" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
-                                <circle cx="7" cy="4" r="0.5" fill="white"/>
-                            </svg>
-                        </div>
-                        Insight Singkat
+                <div class="section-title">
+                    <div class="section-icon">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="7" cy="7" r="6" stroke="white" stroke-width="1.2"/>
+                            <path d="M7 7V4" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+                            <circle cx="7" cy="4" r="0.5" fill="white"/>
+                        </svg>
                     </div>
-                    <div class="insights-grid">
-                        <div class="insight-box">
-                            <div class="insight-label">Approval Rate</div>
-                            <div class="insight-value">87%</div>
-                            <div class="insight-change">↑ 5% dari minggu lalu</div>
-                        </div>
-                        <div class="insight-box">
-                            <div class="insight-label">Avg Response</div>
-                            <div class="insight-value">2h</div>
-                            <div class="insight-change">↓ 30 min lebih cepat</div>
-                        </div>
-                        <div class="insight-box">
-                            <div class="insight-label">Total Kunjung</div>
-                            <div class="insight-value">342</div>
-                            <div class="insight-change">↑ 12% lebih ramai</div>
-                        </div>
-                        <div class="insight-box">
-                            <div class="insight-label">Pending Issues</div>
-                            <div class="insight-value">3</div>
-                            <div class="insight-change">↓ Perlu perhatian</div>
-                        </div>
-                    </div>
+                    Insight Singkat
                 </div>
+                <div class="insights-grid">
+                 @forelse($insight as $item)
+                        <div class="insight-box">
+                            <div class="insight-label">{{ $item['label'] }}</div>
+                            <div class="insight-value">{{ $item['value'] }}</div>
+                            <div class="insight-change">{{ $item['change'] }}</div>
+                        </div>
+                    @empty
+                        <div class="insight-box">
+                            <div class="insight-label">Insight</div>
+                            <div class="insight-value">-</div>
+                            <div class="insight-change">Belum ada data</div>
+                        </div>
+                    @endforelse
+                </div>
+</div>
             </div>
         </main>
     </div>

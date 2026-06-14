@@ -25,7 +25,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             display: flex; 
             flex-direction: column;
-            padding: 20px;
+            padding: 25px;
             box-sizing: border-box;
         }
 
@@ -127,7 +127,6 @@
 
     <div class="form-section">
         <div class="title-header">
-            <div class="title-icon">🚀</div>
             <div class="main-title">Konfirmasi Data</div>
         </div>
 

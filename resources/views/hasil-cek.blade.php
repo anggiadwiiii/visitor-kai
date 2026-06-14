@@ -26,12 +26,12 @@
 
         .mobile-wrapper {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             background: white;
             min-height: 100vh;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            padding: 40px 25px;
+            padding: 25px;
             box-sizing: border-box;
             overflow-y: auto;
             display: flex;
@@ -43,7 +43,7 @@
             content: '';
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            width: 20px;
+            width: 4px;
             background-color: #B2E8B1;
             z-index: 0;
         }
@@ -51,7 +51,7 @@
         .content {
             position: relative;
             z-index: 1;
-            margin-left: 15px;
+            margin: 0;
             flex-grow: 1;
         }
 
@@ -60,7 +60,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
         }
 
         .check-box {
@@ -119,18 +119,18 @@
 
         /* --- QR SECTION --- */
         .qr-card {
-            margin-top: 40px;
+            margin-top: 25px;
             border: 2px dashed #ccc;
-            border-radius: 20px;
-            padding: 25px;
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
             background: #fff;
         }
 
         .qr-code-img {
-            width: 170px;
-            height: 170px;
-            margin: 15px auto;
+            width: 150px;
+            height: 150px;
+            margin: 12px auto;
             display: block;
         }
 
@@ -152,11 +152,11 @@
 
         /* --- INFO BOX --- */
         .info-box {
-            margin-top: 35px;
+            margin-top: 20px;
             background-color: #EAFBF3;
             border: 1px solid #B2E8B1;
-            border-radius: 15px;
-            padding: 18px;
+            border-radius: 12px;
+            padding: 15px;
         }
 
         .info-box h4 {
@@ -187,8 +187,8 @@
 
         /* --- TOMBOL BACK --- */
         .footer-actions {
-            margin-top: 40px;
-            padding-bottom: 20px;
+            margin-top: 25px;
+            padding-bottom: 10px;
         }
 
         .btn-back {
@@ -227,28 +227,28 @@
             </div>
             <div>
                 <h1 class="status-title">{{ $statusText }}</h1>
-                <p class="status-sub">Tanggal Pengajuan: {{ $data->created_at->format('d M Y') }}</p>
+                <p class="status-sub">Tanggal Pengajuan: {{ $pengajuan->created_at->format('d M Y') }}</p>
             </div>
         </div>
 
         <div class="detail-item">
             <span class="label">Nomor Pengajuan</span>
-            <span class="value">{{ $data->nomor }}</span>
+            <span class="value">{{ $inputNomor }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Nama</span>
-            <span class="value">{{ $data->nama }}</span>
+            <span class="value">{{ $pengajuan->nama_pengunjung }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Area/Stasiun</span>
-            <span class="value">{{ $data->stasiun_kunjungan }}</span>
+            <span class="value">{{ $pengajuan->stasiun_kunjungan }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Tanggal Kunjungan</span>
-            <span class="value">{{ $data->tanggal_kunjungan }}</span>
+            <span class="value">{{ $pengajuan->tanggal_kunjungan }}</span>
         </div>
 
         <div class="detail-item">
@@ -259,12 +259,17 @@
         @if($isApproved)
         <div class="qr-card">
             <div style="font-size: 13px; font-weight: 700; margin-bottom: 15px;">QR Code Check-In/out</div>
-            {!! $qrCodeHtml !!}
+            <div id="qr-container">
+                {!! $qrCodeHtml !!}
+            </div>
+            <div style="font-size: 12px; font-weight: 600; color: #333; margin: 15px 0 8px 0; word-break: break-all;">
+                {{ $qrToken }}
+            </div>
             <p style="font-size: 11px; color: #666; margin-bottom: 20px;">Tunjukkan QR Code ini ke petugas keamanan</p>
-            <a href="#" class="btn-download">
+            <button onclick="downloadQR()" class="btn-download">
                 <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 Download QR Code
-            </a>
+            </button>
         </div>
         @endif
 
@@ -281,7 +286,6 @@
                 <li>Permohonan telah dibatalkan</li>
                 @else
                 <li>Permohonan sedang diproses</li>
-                <li>Notifikasi akan dikirim via email/WhatsApp</li>
                 @endif
             </ul>
         </div>
@@ -297,6 +301,39 @@
 
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+function downloadQR() {
+    const qrContainer = document.getElementById('qr-container');
+    const qrToken = '{{ $qrToken }}';
+    
+    // Get SVG element
+    const svgElement = qrContainer.querySelector('svg');
+    
+    if (!svgElement) {
+        alert('QR Code tidak ditemukan');
+        return;
+    }
+    
+    // Use html2canvas to capture the QR code
+    html2canvas(qrContainer, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+    }).then(canvas => {
+        // Create download link
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = `QR-${qrToken}-{{ $pengajuan->id }}.png`;
+        link.click();
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Gagal download QR Code. Silakan coba lagi.');
+    });
+}
+</script>
 
 </body>
 </html>

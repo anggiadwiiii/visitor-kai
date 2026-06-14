@@ -15,7 +15,7 @@
         .mobile-container { 
             width: 100%; max-width: 420px; min-height: 100vh; background: #ffffff; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; 
-            flex-direction: column; padding: 20px; box-sizing: border-box;
+            flex-direction: column; padding: 25px; box-sizing: border-box;
         }
 
         /* --- STEPPER BOX UNIFIED COLOR --- */
@@ -110,9 +110,9 @@
         <div class="info-section">
             <div class="info-title">Informasi Penting :</div>
             <ul class="info-list">
-                <li class="info-item"><div class="dot"></div><span>Notifikasi akan dikirim melalui Email/WhatsApp</span></li>
                 <li class="info-item"><div class="dot"></div><span>Simpan nomor pengajuan untuk tracking status</span></li>
-                <li class="info-item"><div class="dot"></div><span>Hubungi (0274) xxxxxx jika ada pertanyaan</span></li>
+                <li class="info-item"><div class="dot"></div><span>Cek status pengajuan melalui menu "Cek Status"</span></li>
+                <li class="info-item"><div class="dot"></div><span>Hubungi petugas jika ada pertanyaan</span></li>
             </ul>
         </div>
 

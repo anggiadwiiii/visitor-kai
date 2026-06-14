@@ -21,11 +21,11 @@ class AdminAuth
             return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Check if user has admin or petugas role
+        // Check if user has admin role only
         $user = Auth::user();
-        if ($user->role !== 'Admin' && $user->role !== 'Petugas') {
+        if ($user->role !== 'Admin') {
             Auth::logout();
-            return redirect()->route('admin.login')->with('error', 'Anda tidak memiliki akses.');
+            return redirect()->route('admin.login')->with('error', 'Anda tidak memiliki akses. Hanya Admin yang dapat mengakses dashboard ini.');
         }
 
         // Check if user status is active

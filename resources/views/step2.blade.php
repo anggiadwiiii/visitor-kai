@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Step 2 - Data Diri</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -25,7 +27,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             display: flex; 
             flex-direction: column; 
-            padding: 20px;
+            padding: 25px;
             box-sizing: border-box;
         }
 
@@ -83,6 +85,19 @@
             box-sizing: border-box; font-family: inherit; font-size: 12px;
         }
 
+        input.is-invalid, select.is-invalid {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 11px;
+            margin-top: 4px;
+            font-weight: 500;
+            display: block;
+        }
+
         /* BUTTONS */
         .buttons { display: flex; gap: 10px; margin-top: 10px; }
         .btn-back { 
@@ -112,7 +127,6 @@
 
     <div class="form-section">
         <div class="title-header">
-            <div class="title-icon">👤</div>
             <div class="main-title">Data Diri Kunjungan:</div>
         </div>
 
@@ -125,37 +139,58 @@
 
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" name="nama" value="{{ $data['nama'] ?? '' }}" placeholder="Masukkan nama lengkap">
+                <input type="text" name="nama" value="{{ $data['nama'] ?? '' }}" placeholder="Masukkan nama lengkap" class="{{ $errors->has('nama') ? 'is-invalid' : '' }}">
+                @if($errors->has('nama'))
+                    <span class="error-message">{{ $errors->first('nama') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Instansi / Perusahaan</label>
-                <input type="text" name="instansi" value="{{ $data['instansi'] ?? '' }}" placeholder="Masukkan instansi">
+                <input type="text" name="instansi" value="{{ $data['instansi'] ?? '' }}" placeholder="Masukkan instansi" class="{{ $errors->has('instansi') ? 'is-invalid' : '' }}">
+                @if($errors->has('instansi'))
+                    <span class="error-message">{{ $errors->first('instansi') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Nama PIC</label>
-                <input type="text" name="nama_pic" value="{{ $data['nama_pic'] ?? '' }}" placeholder="Masukkan nama PIC">
+                <input type="text" name="nama_pic" value="{{ $data['nama_pic'] ?? '' }}" placeholder="Masukkan nama PIC" class="{{ $errors->has('nama_pic') ? 'is-invalid' : '' }}">
+                @if($errors->has('nama_pic'))
+                    <span class="error-message">{{ $errors->first('nama_pic') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Jabatan PIC</label>
-                <input type="text" name="jabatan_pic" value="{{ $data['jabatan_pic'] ?? '' }}" placeholder="Masukkan jabatan PIC">
+                <input type="text" name="jabatan_pic" value="{{ $data['jabatan_pic'] ?? '' }}" placeholder="Masukkan jabatan PIC" class="{{ $errors->has('jabatan_pic') ? 'is-invalid' : '' }}">
+                @if($errors->has('jabatan_pic'))
+                    <span class="error-message">{{ $errors->first('jabatan_pic') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Nomor Handphone</label>
-                <input type="tel" name="no_hp" value="{{ $data['no_hp'] ?? '' }}" placeholder="0812xxxx">
+                <input type="tel" name="no_hp" value="{{ $data['no_hp'] ?? '' }}" placeholder="0812xxxx" class="{{ $errors->has('no_hp') ? 'is-invalid' : '' }}">
+                @if($errors->has('no_hp'))
+                    <span class="error-message">{{ $errors->first('no_hp') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" value="{{ $data['email'] ?? '' }}" placeholder="email@example.com">
+                <input type="email" name="email" value="{{ $data['email'] ?? '' }}" placeholder="email@example.com" class="{{ $errors->has('email') ? 'is-invalid' : '' }}">
+                @if($errors->has('email'))
+                    <span class="error-message">{{ $errors->first('email') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Tanggal Kunjungan</label>
-                <input type="date" name="tanggal_kunjungan" value="{{ $data['tanggal_kunjungan'] ?? '' }}">
+                <input type="date" name="tanggal_kunjungan" value="{{ $data['tanggal_kunjungan'] ?? '' }}" class="{{ $errors->has('tanggal_kunjungan') ? 'is-invalid' : '' }}">
+                @if($errors->has('tanggal_kunjungan'))
+                    <span class="error-message">{{ $errors->first('tanggal_kunjungan') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
@@ -165,20 +200,31 @@
 
             <div class="form-group">
                 <label>Stasiun Kunjungan</label>
-                <select name="stasiun_kunjungan">
+                <select name="stasiun_kunjungan" class="{{ $errors->has('stasiun_kunjungan') ? 'is-invalid' : '' }}">
                     <option value="">Pilih Stasiun</option>
                     <option value="Stasiun Lempuyangan" {{ (isset($data['stasiun_kunjungan']) && $data['stasiun_kunjungan'] == 'Stasiun Lempuyangan') ? 'selected' : '' }}>Stasiun Lempuyangan</option>
                     <option value="Stasiun Yogyakarta" {{ (isset($data['stasiun_kunjungan']) && $data['stasiun_kunjungan'] == 'Stasiun Yogyakarta') ? 'selected' : '' }}>Stasiun Yogyakarta</option>
+                    <option value="Stasiun Solo Balapan" {{ (isset($data['stasiun_kunjungan']) && $data['stasiun_kunjungan'] == 'Stasiun Solo Balapan') ? 'selected' : '' }}>Stasiun Solo Balapan</option>
+                    <option value="Stasiun Purwosari" {{ (isset($data['stasiun_kunjungan']) && $data['stasiun_kunjungan'] == 'Stasiun Purwosari') ? 'selected' : '' }}>Stasiun Purwosari</option>
+                    <option value="Stasiun Klaten" {{ (isset($data['stasiun_kunjungan']) && $data['stasiun_kunjungan'] == 'Stasiun Klaten') ? 'selected' : '' }}>Stasiun Klaten</option>
                 </select>
+                @if($errors->has('stasiun_kunjungan'))
+                    <span class="error-message">{{ $errors->first('stasiun_kunjungan') }}</span>
+                @endif
             </div>
 
             <div class="form-group">
                 <label>Layanan Pendampingan</label>
-                <select name="layanan_pendampingan">
+                <select name="layanan_pendampingan" class="{{ $errors->has('layanan_pendampingan') ? 'is-invalid' : '' }}">
                     <option value="">Pilih Layanan</option>
-                    <option value="Dengan Pendamping" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Dengan Pendamping') ? 'selected' : '' }}>Dengan Pendamping</option>
-                    <option value="Tanpa Pendamping" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Tanpa Pendamping') ? 'selected' : '' }}>Tanpa Pendamping</option>
+                    <option value="Pilih Layanan" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Pilih Layanan') ? 'selected' : '' }}>Pilih Layanan</option>
+                    <option value="Layanan Pendampingan Umum" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Layanan Pendampingan Umum') ? 'selected' : '' }}>Layanan Pendampingan Umum</option>
+                    <option value="Layanan Pendampingan VIP" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Layanan Pendampingan VIP') ? 'selected' : '' }}>Layanan Pendampingan VIP</option>
+                    <option value="Tanpa Pendampingan" {{ (isset($data['layanan_pendampingan']) && $data['layanan_pendampingan'] == 'Tanpa Pendampingan') ? 'selected' : '' }}>Tanpa Pendampingan</option>
                 </select>
+                @if($errors->has('layanan_pendampingan'))
+                    <span class="error-message">{{ $errors->first('layanan_pendampingan') }}</span>
+                @endif
             </div>
 
             <div class="buttons">

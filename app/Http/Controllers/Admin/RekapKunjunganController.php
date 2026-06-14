@@ -5,75 +5,193 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pengajuan;
 use App\Models\Visitor;
-use App\Exports\RekapExport;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RekapKunjunganController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $search = $request->search;
+        $search = trim((string) $request->get('search', ''));
+        $tanggal = trim((string) $request->get('tanggal', ''));
+        $dateFrom = trim((string) $request->get('date_from', ''));
+        $dateTo = trim((string) $request->get('date_to', ''));
+        $status = trim((string) $request->get('status', ''));
 
-        $query = Visitor::query();
+        $query = Visitor::with('pengajuan');
 
-        if ($search) {
-            $query->where('nama_pengunjung', 'like', "%{$search}%")
-                  ->orWhere('email_pengunjung', 'like', "%{$search}%");
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('email_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('asal_institusi', 'like', "%{$search}%")
+                    ->orWhere('keterangan', 'like', "%{$search}%");
+            });
         }
 
-        $kunjungan = $query->paginate(15);
+        if ($tanggal !== '') {
+            $query->whereDate('created_at', $tanggal);
+        }
+
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        if ($status !== '') {
+            if ($status === 'checkin') {
+                $query->whereNotNull('waktu_masuk');
+            } elseif ($status === 'checkout') {
+                $query->whereNotNull('waktu_keluar');
+            } elseif ($status === 'aktif') {
+                $query->whereNotNull('waktu_masuk')->whereNull('waktu_keluar');
+            }
+        }
+
+        $rows = $query->latest()->get();
+
+        $kunjungan = $rows->map(function (Visitor $item) {
+            return [
+                'id' => $item->id,
+                'nama' => $item->nama_pengunjung ?? '-',
+                'tanggal' => $item->created_at
+                    ? $item->created_at->translatedFormat('d F Y')
+                    : '-',
+                'keterangan' => $item->getStatus(),
+            ];
+        });
+
+        $summaryQuery = Visitor::query();
+
+        if ($search !== '') {
+            $summaryQuery->where(function ($q) use ($search) {
+                $q->where('nama_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('email_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('asal_institusi', 'like', "%{$search}%")
+                    ->orWhere('keterangan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($tanggal !== '') {
+            $summaryQuery->whereDate('created_at', $tanggal);
+        }
+
+        if ($dateFrom !== '') {
+            $summaryQuery->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo !== '') {
+            $summaryQuery->whereDate('created_at', '<=', $dateTo);
+        }
 
         $summary = [
-            'total' => Visitor::count(),
-            'checkin' => Visitor::whereNotNull('waktu_masuk')->count(),
-            'checkout' => Visitor::whereNotNull('waktu_keluar')->count(),
+            'total' => (clone $summaryQuery)->count(),
+            'checkin' => (clone $summaryQuery)->whereNotNull('waktu_masuk')->count(),
+            'checkout' => (clone $summaryQuery)->whereNotNull('waktu_keluar')->count(),
         ];
 
-        $stats = [
-            'pengajuan_baru' => Pengajuan::where('status', 'Menunggu')->count(),
-            'disetujui' => Pengajuan::where('status', 'Disetujui')->count(),
-            'pengunjung_hari_ini' => Visitor::whereDate('waktu_masuk', now()->toDateString())->count(),
-            'pengunjung_aktif' => Visitor::whereNull('waktu_keluar')->count(),
-        ];
-
-        $adminName = auth()->user()->nama ?? 'Admin';
+        $adminName = auth()->user()->nama ?? auth()->user()->name ?? session('admin_username', 'Admin');
         $pengajuanCount = Pengajuan::where('status', 'Menunggu')->count();
 
-        return view('admin.rekap', compact(
-            'kunjungan',
-            'summary',
-            'search',
-            'adminName',
-            'stats',
-            'pengajuanCount'
-        ));
+        return view('admin.rekap', [
+            'adminName' => $adminName,
+            'pengajuanCount' => $pengajuanCount,
+            'summary' => $summary,
+            'search' => $search,
+            'tanggal' => $tanggal,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'status' => $status,
+            'kunjungan' => $kunjungan,
+        ]);
     }
 
-    public function export(Request $request)
+    public function export(Request $request): StreamedResponse
     {
-        $search = $request->search;
+        $search = trim((string) $request->get('search', ''));
+        $tanggal = trim((string) $request->get('tanggal', ''));
+        $dateFrom = trim((string) $request->get('date_from', ''));
+        $dateTo = trim((string) $request->get('date_to', ''));
+        $status = trim((string) $request->get('status', ''));
 
-        $kunjungan = collect([
-            ['id' => 1, 'nama' => 'Alea Arunika', 'tanggal' => '13/12/2025', 'keterangan' => 'Selesai'],
-            ['id' => 2, 'nama' => 'Bambang Kuncoro', 'tanggal' => '10/12/2025', 'keterangan' => 'Selesai'],
-            ['id' => 3, 'nama' => 'Sulis Sekar Arum', 'tanggal' => '02/12/2025', 'keterangan' => 'Selesai'],
-            ['id' => 4, 'nama' => 'Husna Latifah Khoiriyah', 'tanggal' => '27/11/2025', 'keterangan' => 'Selesai'],
-            ['id' => 5, 'nama' => 'Erwin Pamungkas', 'tanggal' => '21/11/2025', 'keterangan' => 'Selesai'],
-            ['id' => 6, 'nama' => 'Fajar Setiawan', 'tanggal' => '13/10/2025', 'keterangan' => 'Selesai'],
-            ['id' => 7, 'nama' => 'Farhan Farid Achmad', 'tanggal' => '01/09/2025', 'keterangan' => 'Selesai'],
-            ['id' => 8, 'nama' => 'Agus Koesnaidi', 'tanggal' => '11/08/2025', 'keterangan' => 'Selesai'],
-            ['id' => 9, 'nama' => 'Septi Setiyani', 'tanggal' => '19/07/2025', 'keterangan' => 'Selesai'],
-        ]);
+        $query = Visitor::with('pengajuan');
 
-        if ($search) {
-            $kunjungan = $kunjungan->filter(function ($item) use ($search) {
-                return str_contains(strtolower($item['nama']), strtolower($search));
-            })->values();
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('email_pengunjung', 'like', "%{$search}%")
+                    ->orWhere('asal_institusi', 'like', "%{$search}%")
+                    ->orWhere('keterangan', 'like', "%{$search}%");
+            });
         }
 
-        $filename = 'rekap_kunjungan_' . now()->format('Ymd_His') . '.xlsx';
+        if ($tanggal !== '') {
+            $query->whereDate('created_at', $tanggal);
+        }
 
-        return Excel::download(new RekapExport($kunjungan), $filename);
+        if ($dateFrom !== '') {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo !== '') {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        if ($status !== '') {
+            if ($status === 'checkin') {
+                $query->whereNotNull('waktu_masuk');
+            } elseif ($status === 'checkout') {
+                $query->whereNotNull('waktu_keluar');
+            } elseif ($status === 'aktif') {
+                $query->whereNotNull('waktu_masuk')->whereNull('waktu_keluar');
+            }
+        }
+
+        $rows = $query->latest()->get();
+
+        $filename = 'rekap_kunjungan_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($handle, [
+                'Nama',
+                'Email',
+                'Instansi',
+                'Tanggal Dibuat',
+                'Waktu Masuk',
+                'Waktu Keluar',
+                'Status',
+                'Keterangan',
+            ]);
+
+            foreach ($rows as $item) {
+                fputcsv($handle, [
+                    $item->nama_pengunjung,
+                    $item->email_pengunjung,
+                    $item->asal_institusi,
+                    optional($item->created_at)->format('d-m-Y H:i'),
+                    optional($item->waktu_masuk)->format('d-m-Y H:i'),
+                    optional($item->waktu_keluar)->format('d-m-Y H:i'),
+                    $item->getStatus(),
+                    $item->keterangan,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

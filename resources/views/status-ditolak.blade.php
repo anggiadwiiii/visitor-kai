@@ -26,12 +26,12 @@
 
         .mobile-wrapper {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
             background: white;
             min-height: 100vh;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            padding: 40px 25px;
+            padding: 25px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -42,7 +42,7 @@
             content: '';
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            width: 20px;
+            width: 4px;
             background-color: var(--status-red);
             z-index: 0;
         }
@@ -50,7 +50,7 @@
         .content {
             position: relative;
             z-index: 1;
-            margin-left: 15px;
+            margin: 0;
             flex-grow: 1;
         }
 
@@ -59,7 +59,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
         }
 
         .icon-circle {
@@ -118,12 +118,12 @@
 
         /* --- ALASAN PENOLAKAN BOX --- */
         .reason-box {
-            margin-top: 30px;
+            margin-top: 20px;
             background-color: #fff;
             border: 1px solid var(--status-red);
             border-left: 6px solid var(--status-red);
             border-radius: 12px;
-            padding: 18px;
+            padding: 15px;
         }
 
         .reason-header {
@@ -145,10 +145,10 @@
 
         /* --- FOOTER BUTTONS --- */
         .footer-actions {
-            margin-top: 40px;
+            margin-top: 25px;
             display: flex;
             gap: 15px;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         .btn {
@@ -191,36 +191,37 @@
                 </svg>
             </div>
             <div>
-                <h1 class="status-title">Permohonan Ditolak</h1>
-                <p class="status-sub">Tanggal : 14 Desember 2025, 14.30 WIB</p>
+                <h1 class="status-title">{{ $statusText }}</h1>
+                <p class="status-sub">Tanggal : {{ $isRejected && $pengajuan->tanggal_ditolak ? $pengajuan->tanggal_ditolak->format('d M Y, H.i') : 'Dibatalkan' }} WIB</p>
             </div>
         </div>
 
         <div class="detail-item">
             <span class="label">Nomor Pengajuan</span>
-            <span class="value">VST-2025-123456</span>
+            <span class="value">{{ $inputNomor }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Nama</span>
-            <span class="value">Alea Arunika</span>
+            <span class="value">{{ $pengajuan->nama_pengunjung }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Instansi</span>
-            <span class="value">Universitas Terbuka Surabaya</span>
+            <span class="value">{{ $pengajuan->asal_institusi ?? '-' }}</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Tanggal Pengajuan</span>
-            <span class="value">13 Desember 2025, 09.35 WIB</span>
+            <span class="value">{{ $pengajuan->created_at->format('d M Y, H.i') }} WIB</span>
         </div>
 
         <div class="detail-item">
             <span class="label">Status</span>
-            <span class="value" style="color: var(--status-red);">Ditolak</span>
+            <span class="value" style="color: {{ $currentColor }};">{{ $statusText }}</span>
         </div>
 
+        @if($isRejected && $pengajuan->catatan_admin)
         <div class="reason-box">
             <div class="reason-header">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -231,9 +232,24 @@
                 Alasan Penolakan:
             </div>
             <p class="reason-text">
-                Dokumen yang diunggah tidak sesuai dengan persyaratan. Mohon untuk mengajukan permohonan baru dengan dokumen yang lengkap dan valid.
+                {{ $pengajuan->catatan_admin }}
             </p>
         </div>
+        @elseif($isCancelled)
+        <div class="reason-box">
+            <div class="reason-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Keterangan:
+            </div>
+            <p class="reason-text">
+                Permohonan ini telah dibatalkan oleh pemohon.
+            </p>
+        </div>
+        @endif
 
         <div class="footer-actions">
             <button class="btn btn-grey" onclick="window.location.href='/'">
@@ -243,11 +259,11 @@
                 Ajukan Ulang
             </button>
             
-            <button class="btn btn-blue" onclick="alert('Menghubungi Admin...')">
+            <button class="btn btn-blue" onclick="window.open('https://wa.me/62895342116058', '_blank')">
                 <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                Hubungi Admin
+                Hubungi Petugas Keamanan
             </button>
         </div>
 

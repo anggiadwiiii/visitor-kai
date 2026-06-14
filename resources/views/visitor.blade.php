@@ -5,71 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visitor KAI</title>
 
+<link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+<link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
     margin: 0;
+    padding: 0;
     font-family: 'Poppins', sans-serif;
-    background: #f5f5f5;
+    background-color: #f7f7f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 420px;
-    margin: auto;
-    padding: 20px;
+    width: 100%;
+    max-width: 100%; /* Full width on mobile */
+    min-height: 100vh;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px; /* Responsive padding */
+    box-sizing: border-box;
     position: relative;
+    justify-content: space-between;
+}
+
+@media (min-width: 641px) {
+    .container {
+        max-width: 420px;
+        padding: 25px;
+    }
+}
+
+.content-wrapper {
+    flex: 1;
+    padding: 0;
 }
 
 .logo {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 80px;
+    top: 20px;
+    right: 20px;
+    width: 70px;
+    height: auto;
+    object-fit: contain;
 }
 
 .title-box {
     background: linear-gradient(to right, #2B09A4, #C40E75);
     color: white;
     text-align: center;
-    padding: 12px;
-    border-radius: 25px;
+    padding: 14px;
+    border-radius: 12px;
     font-weight: 600;
-    margin-top: 50px;
-    opacity: 0.7;
+    font-size: 16px;
+    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
 .subtitle {
     text-align: center;
-    font-size: 13px;
+    font-size: 12px;
     color: #555;
-    margin-top: 8px;
+    margin-top: 5px;
+    margin-bottom: 20px;
 }
 
 .card {
-    border-radius: 15px;
-    padding: 20px;
-    margin-top: 20px;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
     text-align: center;
     background: white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
 }
 
 .icon-wrapper {
-    width: 76px;
-    height: 76px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: linear-gradient(to right, #2B09A4, #C40E75);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: auto;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    transition: transform 0.3s ease;
+}
+
+.icon-wrapper:hover {
+    transform: scale(1.08);
 }
 
 .icon {
-    width: 70px;
-    height: 70px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background-color: white;
     display: flex;
@@ -78,59 +121,58 @@ body {
 }
 
 .icon svg {
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
 }
 
 .card-title {
     font-weight: 600;
-    font-size: 16px;
-    margin-bottom: 5px;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
 }
 
 .card-desc {
-    font-size: 12px;
-    color: #666;
-    margin: 10px 0;
+    font-size: 11px;
+    color: #888;
+    margin: 8px 0 12px 0;
+    line-height: 1.4;
 }
 
 .btn {
     background: linear-gradient(to right, #2B09A4, #C40E75);
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    opacity: 0.7;
+    box-shadow: 0 2px 6px rgba(224, 82, 151, 0.2);
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(224, 82, 151, 0.3);
 }
 
 .train {
     width: 100%;
-    margin-top: 30px;
+    margin-top: auto;
+    padding-bottom: 10px;
     border-radius: 50% 50% 0 0;
 }
 
-/* Hover untuk card */
-.card:hover {
-    transform: translateY(-5px); /* card naik sedikit */
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* shadow lebih besar */
-    transition: all 0.3s ease;
-}
-
-/* Hover untuk icon wrapper */
-.icon-wrapper:hover {
-    transform: scale(1.1); /* membesar 10% */
-    transition: transform 0.3s ease;
-}
-
-/* Hover untuk button */
-.btn:hover {
-    filter: brightness(1.1); /* sedikit lebih terang */
-    transform: scale(1.05); /* membesar sedikit */
-    transition: all 0.3s ease;
+.footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+    font-size: 11px;
+    color: #999;
 }
 </style>
 </head>
@@ -142,17 +184,18 @@ body {
     <!-- LOGO -->
     <img src="{{ asset('images/logo.png') }}" class="logo">
 
-    <!-- HEADER -->
-    <div class="title-box">
-        Pengajuan Kartu Visitor
-    </div>
+    <div class="content-wrapper">
+        <!-- HEADER -->
+        <div class="title-box">
+            Pengajuan Kartu Visitor
+        </div>
 
-    <div class="subtitle">
-        Pilih layanan yang anda butuhkan
-    </div>
+        <div class="subtitle">
+            Pilih layanan yang anda butuhkan
+        </div>
 
-    <!-- CARD 1: Ajukan Permohonan -->
-    <div class="card">
+        <!-- CARD 1: Ajukan Permohonan -->
+        <div class="card">
         <div class="icon-wrapper">
             <div class="icon">
                 <!-- SVG gradien -->
@@ -205,9 +248,11 @@ body {
             CEK STATUS
         </a>
     </div>
+    </div>
 
-    <!-- TRAIN -->
-    <img src="{{ asset('images/kereta.png') }}" class="train">
+    <div class="footer">
+        <p>&copy; 2026 PT. Kereta Api Indonesia. All rights reserved.</p>
+    </div>
 
 </div>
 

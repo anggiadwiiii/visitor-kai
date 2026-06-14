@@ -13,7 +13,7 @@
         }
         .mobile-container { 
             width: 100%; max-width: 420px; min-height: 100vh; background: #ffffff; 
-            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; padding: 25px; box-sizing: border-box;
         }
 
         /* STEPPER BOX */

@@ -3,76 +3,69 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pengajuan;
+use App\Models\Visitor;
+use Illuminate\View\View;
 
 class DetailRekapController extends Controller
 {
-    public function show($id)
+    public function show($id): View
     {
-        $adminName = session('admin_username', 'Admin');
+        $visitor = Visitor::with('pengajuan')->findOrFail($id);
 
-        $kunjungan = collect([
-            1 => [
-                'id' => 1,
-                'nama' => 'Alea Arunika',
-                'jenis' => 'Visitor Pelajar/Magang',
-                'instansi' => 'Universitas Terbuka Surabaya',
-                'nomor_pengajuan' => 'VST-CY2K6',
-                'penanggung_jawab' => 'Dilan',
-                'jabatan_pic' => 'Manajer IT',
-                'stasiun_kunjungan' => 'St. Lempuyangan',
-                'dokumen' => 'Surat Tugas (1).pdf',
-                'tanggal_kunjungan' => '13/12/2025',
-                'check_in' => '08:15 WIB',
-                'check_out' => '15:42 WIB',
-                'durasi' => '7 Jam 27 Menit',
-                'status' => 'Selesai',
-                'tujuan' => 'Meeting dengan HRD terkait Project Magang.',
-                'catatan' => 'Kunjungan selesai dengan tertib dan seluruh area yang diakses sudah dikembalikan dalam kondisi aman.',
-            ],
-            2 => [
-                'id' => 2,
-                'nama' => 'Bambang Kuncoro',
-                'jenis' => 'Visitor Perusahaan',
-                'instansi' => 'PT. Maju Jaya',
-                'nomor_pengajuan' => 'VST-DK91A',
-                'penanggung_jawab' => 'Rizky',
-                'jabatan_pic' => 'Supervisor Operasional',
-                'stasiun_kunjungan' => 'St. Tugu Yogyakarta',
-                'dokumen' => 'Surat Kunjungan.pdf',
-                'tanggal_kunjungan' => '10/12/2025',
-                'check_in' => '09:05 WIB',
-                'check_out' => '12:10 WIB',
-                'durasi' => '3 Jam 05 Menit',
-                'status' => 'Selesai',
-                'tujuan' => 'Koordinasi operasional lapangan.',
-                'catatan' => 'Visitor telah check-out sesuai prosedur.',
-            ],
-            3 => [
-                'id' => 3,
-                'nama' => 'Sulis Sekar Arum',
-                'jenis' => 'Visitor Instansi',
-                'instansi' => 'Dinas Perhubungan',
-                'nomor_pengajuan' => 'VST-AJ73M',
-                'penanggung_jawab' => 'Bayu',
-                'jabatan_pic' => 'Kepala Pos',
-                'stasiun_kunjungan' => 'St. Tugu Yogyakarta',
-                'dokumen' => 'Surat Dinas.pdf',
-                'tanggal_kunjungan' => '02/12/2025',
-                'check_in' => '10:20 WIB',
-                'check_out' => '13:00 WIB',
-                'durasi' => '2 Jam 40 Menit',
-                'status' => 'Selesai',
-                'tujuan' => 'Monitoring fasilitas pelayanan.',
-                'catatan' => 'Kunjungan berjalan lancar.',
-            ],
-        ])->get((int) $id);
+        $adminName = auth()->user()->nama ?? auth()->user()->name ?? session('admin_username', 'Admin');
+        $pengajuanCount = Pengajuan::where('status', 'Menunggu')->count();
 
-        if (!$kunjungan) {
-            abort(404);
+        $durasi = '-';
+
+        if ($visitor->waktu_masuk && $visitor->waktu_keluar) {
+            $diff = $visitor->waktu_masuk->diff($visitor->waktu_keluar);
+            $durasi = $diff->h . ' jam ' . $diff->i . ' menit';
         }
 
-        $pengajuanCount = $this->getPengajuanCount();
+        $kunjungan = [
+            'id' => $visitor->id,
+            'nama' => $visitor->nama_pengunjung ?? '-',
+            'jenis' => 'Visitor Kunjungan',
+            'instansi' => $visitor->asal_institusi ?? '-',
+            'email' => $visitor->email_pengunjung ?? '-',
+            'no_identitas' => $visitor->no_identitas ?? '-',
+            'jenis_identitas' => $visitor->jenis_identitas ?? '-',
 
-        return view('admin.rekap-detail', compact('kunjungan', 'adminName', 'pengajuanCount'));
+            'tanggal_kunjungan' => $visitor->pengajuan && $visitor->pengajuan->tanggal_kunjungan
+                ? $visitor->pengajuan->tanggal_kunjungan->translatedFormat('d F Y')
+                : '-',
+
+            'check_in' => $visitor->waktu_masuk
+                ? $visitor->waktu_masuk->translatedFormat('H:i')
+                : '-',
+
+            'check_out' => $visitor->waktu_keluar
+                ? $visitor->waktu_keluar->translatedFormat('H:i')
+                : '-',
+
+            'durasi' => $durasi,
+
+            'status' => $visitor->getStatus(),
+            'keterangan' => $visitor->keterangan ?? '-',
+            'catatan' => $visitor->keterangan ?? '-',
+
+            'tujuan' => $visitor->pengajuan->tujuan_kunjungan ?? '-',
+
+            'nomor_pengajuan' => $visitor->pengajuan
+                ? 'PGJ-' . str_pad((string) $visitor->pengajuan->id, 5, '0', STR_PAD_LEFT)
+                : '-',
+
+            'penanggung_jawab' => $adminName,
+            'jabatan_pic' => $visitor->pengajuan->jabatan_pic ?? '-',
+            'stasiun_kunjungan' => $visitor->pengajuan->stasiun_kunjungan ?? '-',
+            'dokumen' => $visitor->pengajuan->dokumen ?? '-',
+        ];
+
+        return view('admin.rekap-detail', [
+            'adminName' => $adminName,
+            'pengajuanCount' => $pengajuanCount,
+            'kunjungan' => $kunjungan,
+        ]);
     }
 }

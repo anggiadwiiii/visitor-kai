@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Step 3 - Akses Pintu</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -19,13 +21,13 @@
         
         .mobile-container { 
             width: 100%; 
-            max-width: 400px; 
+            max-width: 420px; 
             min-height: 100vh; 
             background: #ffffff; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             display: flex; 
             flex-direction: column; 
-            padding: 20px;
+            padding: 25px;
             box-sizing: border-box;
         }
 
@@ -113,7 +115,6 @@
 
     <div class="form-section">
         <div class="title-header">
-            <div class="title-icon">👤</div>
             <div class="main-title">Permohonan Akses Pintu:</div>
         </div>
 
@@ -128,6 +129,10 @@
                 <select name="accessDoor">
                     <option value="">Pilih Pintu</option>
                     <option value="Pintu Utama" {{ (isset($data['accessDoor']) && $data['accessDoor'] == 'Pintu Utama') ? 'selected' : '' }}>Pintu Utama</option>
+                    <option value="Barat" {{ (isset($data['accessDoor']) && $data['accessDoor'] == 'Barat') ? 'selected' : '' }}>Barat</option>
+                    <option value="Timur" {{ (isset($data['accessDoor']) && $data['accessDoor'] == 'Timur') ? 'selected' : '' }}>Timur</option>
+                    <option value="Utara" {{ (isset($data['accessDoor']) && $data['accessDoor'] == 'Utara') ? 'selected' : '' }}>Utara</option>
+                    <option value="Selatan" {{ (isset($data['accessDoor']) && $data['accessDoor'] == 'Selatan') ? 'selected' : '' }}>Selatan</option>
                 </select>
             </div>
 

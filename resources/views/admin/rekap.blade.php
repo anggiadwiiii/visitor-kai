@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rekap Kunjungan</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
 
     <style>
         * {
@@ -54,9 +55,10 @@
         }
 
         .logo-img {
-            width: 150px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             margin: 0 auto;
         }
@@ -385,7 +387,7 @@
 
         .search-export {
             display: grid;
-            grid-template-columns: 1fr 116px;
+            grid-template-columns: 1fr 1fr 116px 116px;
             gap: 12px;
             margin-bottom: 12px;
             align-items: center;
@@ -418,10 +420,32 @@
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #555;
+            color: #7651d8;
             pointer-events: none;
         }
 
+        .date-filter-box {
+            position: relative;
+        }
+
+        .date-input {
+            width: 100%;
+            height: 34px;
+            border: 1px solid #c0c0c0;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 13px;
+            outline: none;
+            background: #fafafa;
+            font-family: inherit;
+            color: #666;
+        }
+
+        .date-input::placeholder {
+            color: #b3b3b3;
+        }
+
+        .filter-btn,
         .export-btn {
             height: 34px;
             border: none;
@@ -431,6 +455,22 @@
             color: white;
             font-size: 12px;
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 14px;
+        }
+
+        .filter-btn:hover,
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .filter-btn iconify-icon,
+        .export-btn iconify-icon {
+            font-size: 16px;
         }
 
         .table-wrap {
@@ -517,6 +557,10 @@
             .page {
                 grid-template-columns: 300px 1fr;
             }
+
+            .search-export {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 900px) {
@@ -538,6 +582,10 @@
             .content {
                 padding: 14px;
             }
+
+            .search-export {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 640px) {
@@ -547,6 +595,7 @@
 
             .search-export {
                 grid-template-columns: 1fr;
+                gap: 10px;
             }
 
             .header-title {
@@ -727,27 +776,35 @@
                     </div>
                 </div>
 
-                <form method="GET" action="{{ route('admin.rekap') }}" class="search-export">
-                    <div class="search-box">
-                        <input
-                            type="text"
-                            name="search"
-                            class="search-input"
-                            placeholder="Cari nama visitor..."
-                            value="{{ $search }}"
-                        >
-                        <div class="search-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.4"/>
-                                <path d="M20 20L16.65 16.65" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                    </div>
+<form method="GET" action="{{ route('admin.rekap') }}" class="search-export">
+    <div class="search-box">
+        <input
+            type="text"
+            name="search"
+            class="search-input"
+            placeholder="Cari nama visitor..."
+            value="{{ $search ?? '' }}"
+        >
+        <div class="search-icon"><iconify-icon icon="mdi:magnify"></iconify-icon></div>
+    </div>
 
-                    <a href="{{ route('admin.rekap.export', ['search' => request('search')]) }}" class="export-btn">
-    Export Excel
-</a>
-                </form>
+    <div class="date-filter-box">
+        <input
+            type="date"
+            name="tanggal"
+            class="date-input"
+            value="{{ request('tanggal') ?? '' }}"
+        >
+    </div>
+
+    <button type="submit" class="filter-btn">
+        <iconify-icon icon="mdi:filter"></iconify-icon> Filter
+    </button>
+
+    <a href="{{ route('admin.rekap.export', ['search' => request('search'), 'tanggal' => request('tanggal')]) }}" class="export-btn">
+        <iconify-icon icon="mdi:download"></iconify-icon> Export
+    </a>
+</form>
 
                 <div class="table-wrap">
                     <table>
@@ -768,7 +825,7 @@
                                         <span class="status-pill">{{ $item['keterangan'] }}</span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('admin.rekap.detail', $loop->iteration) }}" class="detail-btn">Detail</a>
+                                        <a href="{{ route('admin.rekap-detail', $item['id']) }}" class="detail-btn">Detail</a>
                                     </td>
                                 </tr>
                             @empty

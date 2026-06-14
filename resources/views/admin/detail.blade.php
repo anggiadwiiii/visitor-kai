@@ -53,9 +53,10 @@
         }
 
         .logo-img {
-            width: 150px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             margin: 0 auto;
         }
@@ -800,8 +801,8 @@
                     </div>
 
                     <div class="field">
-                        <label>Nama Penanggung Jawab</label>
-                        <div class="field-value">{{ $data->penanggung_jawab ?? ($data['penanggung_jawab'] ?? '-') }}</div>
+                        <label>Nama PIC</label>
+                        <div class="field-value">{{ $data->nama_pic ?? ($data['nama_pic'] ?? '-') }}</div>
                     </div>
 
                     <div class="field">
@@ -815,9 +816,21 @@
                     </div>
 
                     <div class="field">
-                        <label>Dokumen Pendukung</label>
-                        <div class="field-value italic">{{ $data->dokumen ?? ($data['dokumen'] ?? '-') }}</div>
+                    <label>Dokumen Pendukung</label>
+                    <div class="field-value italic">
+                        @php
+                            $dokumen = $data->dokumen ?? ($data['dokumen'] ?? null);
+                        @endphp
+
+                        @if($dokumen)
+                            <a href="{{ \Illuminate\Support\Facades\Storage::url($dokumen) }}" target="_blank">
+                                {{ basename($dokumen) }}
+                            </a>
+                        @else
+                            -
+                        @endif
                     </div>
+                </div>
 
                     <div class="field">
                         <label>Tanggal Mulai</label>
@@ -857,8 +870,12 @@
                 </div>
 
                 <div class="action-row">
-                    <button type="button" class="btn btn-reject" onclick="openModal('rejected')">✕ Tolak</button>
-                    <button type="button" class="btn btn-approve" onclick="openModal('approved')">✔ Setuju</button>
+                    @if($status === 'processing')
+                    <div class="action-row">
+                        <button type="button" class="btn btn-reject" onclick="openModal('rejected')">✕ Tolak</button>
+                        <button type="button" class="btn btn-approve" onclick="openModal('approved')">✔ Setuju</button>
+                    </div>
+                @endif
                 </div>
             </div>
         </main>

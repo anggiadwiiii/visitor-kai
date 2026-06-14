@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Status Pengajuan - Diproses</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -228,9 +229,9 @@
             </div>
         </div>
 
-        <div class="detail-item"><span class="label">Nomor Pengajuan</span><span class="value">{{ $data->nomor }}</span></div>
-        <div class="detail-item"><span class="label">Nama</span><span class="value">{{ $data->nama }}</span></div>
-        <div class="detail-item"><span class="label">Tanggal Pengajuan</span><span class="value">{{ $data->created_at->format('d M Y, H.i') }} WIB</span></div>
+        <div class="detail-item"><span class="label">Nomor Pengajuan</span><span class="value">{{ $inputNomor }}</span></div>
+        <div class="detail-item"><span class="label">Nama</span><span class="value">{{ $pengajuan->nama_pengunjung }}</span></div>
+        <div class="detail-item"><span class="label">Tanggal Pengajuan</span><span class="value">{{ $pengajuan->created_at->format('d M Y, H.i') }} WIB</span></div>
         <div class="detail-item"><span class="label">Status</span><span class="value" style="color: {{ $currentColor }};">{{ $statusText }}</span></div>
         <div class="detail-item"><span class="label">Estimasi Proses</span><span class="value">1-2 Hari Kerja</span></div>
 
@@ -274,9 +275,9 @@
                 <svg class="icon-svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                 Beranda
             </button>
-            <button class="btn btn-blue" onclick="alert('Menghubungi Admin...')">
-                <svg class="stroke-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                Hubungi Admin
+            <button class="btn btn-blue" onclick="window.open('https://wa.me/62895342116058', '_blank')">
+                <svg class="stroke-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                Hubungi Petugas Keamanan
             </button>
             <button class="btn btn-red" style="width: 100%; flex: none;" onclick="showModal('modalBatal')">
                 <svg class="stroke-svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -324,8 +325,48 @@
     function hideModal(id) { document.getElementById(id).style.display = 'none'; }
     
     function prosesBatalKeSukses() {
-        hideModal('modalBatal');
-        setTimeout(() => { showModal('modalSuksesBatal'); }, 200);
+        const nomor = '{{ $inputNomor }}';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        
+        if (!csrfToken) {
+            console.error('CSRF token tidak ditemukan');
+            alert('Terjadi kesalahan keamanan. Refresh halaman dan coba lagi.');
+            return;
+        }
+        
+        // Submit pembatalan ke backend
+        fetch('/cancel-application', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ nomor: nomor })
+        })
+        .then(response => {
+            // Check jika response adalah JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Response bukan JSON: ' + response.status + ' ' + response.statusText);
+            }
+            return response.json().then(data => ({
+                status: response.status,
+                data: data
+            }));
+        })
+        .then(result => {
+            if (result.status === 200 && result.data.success) {
+                hideModal('modalBatal');
+                setTimeout(() => { showModal('modalSuksesBatal'); }, 200);
+            } else {
+                alert('Error: ' + (result.data.message || 'Pembatalan gagal'));
+                console.error('Error response:', result.data);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            alert('Terjadi kesalahan: ' + error.message);
+        });
     }
 
     window.onclick = function(event) {

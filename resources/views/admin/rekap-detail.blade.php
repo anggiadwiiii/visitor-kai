@@ -53,9 +53,10 @@
         }
 
         .logo-img {
-            width: 150px;
+            width: 180px;
             height: auto;
             object-fit: contain;
+            object-position: center;
             display: block;
             margin: 0 auto;
         }
